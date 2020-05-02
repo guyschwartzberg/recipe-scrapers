@@ -157,6 +157,7 @@ class AbstractScraper:
     def reviews(self):
         raise NotImplementedError("This should be implemented.")
 
+    @Decorators.schema_org_priority
     def tags(self):
         raise NotImplementedError("This should be implemented.")
 

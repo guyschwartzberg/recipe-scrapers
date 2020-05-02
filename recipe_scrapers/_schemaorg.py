@@ -95,3 +95,10 @@ class SchemaOrg:
         if type(ratings) == dict:
             return round(float(ratings.get('ratingValue')), 2)
         return round(float(ratings), 2)
+
+    def tags(self):
+        tags = self.data.get("keywords")
+        if tags is None:
+            raise SchemaOrgException('No tag data in SchemaOrg.')
+        if type(tags) == str:
+            return [x.strip() for x in tags.split(',')]
