@@ -1,5 +1,5 @@
 from ._abstract import AbstractScraper
-from ._utils import normalize_string
+from ._utils import normalize_string, get_diet_from_tags
 
 
 class AllRecipes(AbstractScraper):
@@ -15,4 +15,6 @@ class AllRecipes(AbstractScraper):
             return None
         return s.split("|")
 
+    def suitable_for_diet(self):
+        return get_diet_from_tags(self.tags())
 

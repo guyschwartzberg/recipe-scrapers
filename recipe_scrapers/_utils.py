@@ -17,6 +17,8 @@ SERV_REGEX_TO = re.compile(
     r'\d+(\s+to\s+|-)\d+', flags=re.I | re.X
 )
 
+DISH_TYPE = {"diabetic", "glutenfree", "halal", "kosher", "lowcalorie", "lowfat", "lowlactose", "lactosefree", "lowsalt", "vegan", "vegetarian", "highfiber", "dairyfree", "lowcholesterol", "lowsodium"}
+
 
 def get_minutes(element):
     try:
@@ -78,3 +80,10 @@ def normalize_string(string):
             '\n', ' ').replace(
             '\t', ' ').strip()
     )
+
+
+def get_diet_from_tags(tags):
+    if tags is None or type(tags) is not list:
+        return None
+    tags = [re.sub(r'\s+', '', x.replace("-", '')).lower() for x in tags]
+    return list(set(tags).intersection(DISH_TYPE))

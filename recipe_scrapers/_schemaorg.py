@@ -87,6 +87,14 @@ class SchemaOrg:
             )
         return recipeInstructions
 
+    def suitable_for_diet(self):
+        diet = self.data.get("suitableForDiet")
+
+        if diet is None or not diet:
+            return []
+        if type(diet) == list:
+            return [x.strip().replace('http://schema.org/', '').replace('Diet', '').lower() for x in diet]
+
     def ratings(self):
         ratings = self.data.get("aggregateRating", None)
         if ratings is None:
@@ -102,3 +110,5 @@ class SchemaOrg:
             raise SchemaOrgException('No tag data in SchemaOrg.')
         if type(tags) == str:
             return [x.strip() for x in tags.split(',')]
+
+

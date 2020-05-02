@@ -154,6 +154,10 @@ class AbstractScraper:
     def ratings(self):
         raise NotImplementedError("This should be implemented.")
 
+    @Decorators.schema_org_priority
+    def suitable_for_diet(self):
+        return []
+
     def reviews(self):
         raise NotImplementedError("This should be implemented.")
 
