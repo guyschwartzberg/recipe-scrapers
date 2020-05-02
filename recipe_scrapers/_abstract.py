@@ -157,6 +157,9 @@ class AbstractScraper:
     def reviews(self):
         raise NotImplementedError("This should be implemented.")
 
+    def tags(self):
+        raise NotImplementedError("This should be implemented.")
+
     def links(self):
         invalid_href = ('#', '')
         links_html = self.soup.findAll('a', href=True)
