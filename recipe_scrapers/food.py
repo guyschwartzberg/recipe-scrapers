@@ -1,5 +1,5 @@
 from ._abstract import AbstractScraper
-from ._utils import get_minutes, normalize_string, get_yields
+from ._utils import get_minutes, normalize_string, get_yields, get_diet_from_tags
 
 
 class Food(AbstractScraper):
@@ -44,3 +44,15 @@ class Food(AbstractScraper):
             instruction.get_text()
             for instruction in instructions
         ])
+
+    def tags(self):
+        tags_list = self.soup.find(
+            'meta',
+            {'name': 'sailthru.tags'}
+        )
+
+        if type(tags_list['content']) == str:
+            return [x.strip() for x in normalize_string(tags_list['content']).split(',')]
+
+    def suitable_for_diet(self):
+        return get_diet_from_tags(self.tags())

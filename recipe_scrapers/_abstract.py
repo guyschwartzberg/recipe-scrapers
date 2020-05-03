@@ -7,7 +7,7 @@ from ._schemaorg import (
     SchemaOrgException
 )
 
-from ._utils import get_diet_from_tags
+from ._utils import get_diet_from_tags, normalize_string
 
 # some sites close their content for 'bots', so user-agent must be supplied
 
@@ -166,7 +166,14 @@ class AbstractScraper:
 
     @Decorators.schema_org_priority
     def tags(self):
-        raise NotImplementedError("This should be implemented.")
+        tags_list = self.soup.find(
+            'meta',
+            {'name': 'keywords'}
+        )
+
+        if tags_list is not None and type(tags_list['content']) == str:
+            return [x.strip() for x in normalize_string(tags_list['content']).split(',')]
+        return []
 
     def links(self):
         invalid_href = ('#', '')

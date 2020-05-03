@@ -11,7 +11,6 @@ from .budgetbytes import BudgetBytes
 from .closetcooking import ClosetCooking
 from .cookstr import Cookstr
 from .copykat import CopyKat
-from .cybercook import Cybercook
 from .delish import Delish
 from .epicurious import Epicurious
 from .finedininglovers import FineDiningLovers
@@ -45,6 +44,7 @@ from .simplyrecipes import SimplyRecipes
 from .southernliving import SouthernLiving
 from .steamykitchen import SteamyKitchen
 from .tastesoflizzyt import TastesOfLizzyT
+from .tasty import Tasty
 from .tastykitchen import TastyKitchen
 from .thehappyfoodie import TheHappyFoodie
 from .thepioneerwoman import ThePioneerWoman
@@ -69,7 +69,6 @@ SCRAPERS = {
     ClosetCooking.host(): ClosetCooking,
     Cookstr.host(): Cookstr,
     CopyKat.host(): CopyKat,
-    Cybercook.host(): Cybercook,
     Delish.host(): Delish,
     Epicurious.host(): Epicurious,
     FineDiningLovers.host(): FineDiningLovers,
@@ -103,6 +102,7 @@ SCRAPERS = {
     SouthernLiving.host(): SouthernLiving,
     SteamyKitchen.host(): SteamyKitchen,
     TastesOfLizzyT.host(): TastesOfLizzyT,
+    Tasty.host(): Tasty,
     TastyKitchen.host(): TastyKitchen,
     TheHappyFoodie.host(): TheHappyFoodie,
     ThePioneerWoman.host(): ThePioneerWoman,

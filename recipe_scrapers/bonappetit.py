@@ -46,12 +46,3 @@ class BonAppetit(AbstractScraper):
             normalize_string(instruction.get_text())
             for instruction in instructions
         ])
-
-    def tags(self):
-        tags = self.soup.find(
-            'meta',
-            {'name': 'keywords'}
-        )
-
-        if type(tags['content']) == str:
-            return [x.strip() for x in tags['content'].split(',')]
