@@ -7,8 +7,11 @@ from ._schemaorg import (
     SchemaOrgException
 )
 
+from ._utils import get_diet_from_tags
 
 # some sites close their content for 'bots', so user-agent must be supplied
+
+
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
 }
@@ -156,7 +159,7 @@ class AbstractScraper:
 
     @Decorators.schema_org_priority
     def suitable_for_diet(self):
-        return []
+        return get_diet_from_tags(self.tags())
 
     def reviews(self):
         raise NotImplementedError("This should be implemented.")

@@ -73,8 +73,3 @@ class BBCGoodFood(AbstractScraper):
         return list(set([
             normalize_string(tag['content'])
             for tag in tags]))
-
-    def suitable_for_diet(self):
-        return get_diet_from_tags(self.tags())
-
-

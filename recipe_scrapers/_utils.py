@@ -17,7 +17,7 @@ SERV_REGEX_TO = re.compile(
     r'\d+(\s+to\s+|-)\d+', flags=re.I | re.X
 )
 
-DISH_TYPE = {"diabetic", "glutenfree", "halal", "kosher", "lowcalorie", "lowfat", "lowlactose", "lactosefree", "lowsalt", "vegan", "vegetarian", "highfiber", "dairyfree", "lowcholesterol", "lowsodium"}
+DISH_TYPE = {"diabetic", "glutenfree", "halal", "kosher", "lowcalorie", "lowfat", "lowlactose", "lactosefree", "lowsalt", "vegan", "vegetarian", "highfiber", "dairyfree", "lowcholesterol", "lowsodium", "nutfree"}
 
 
 def get_minutes(element):

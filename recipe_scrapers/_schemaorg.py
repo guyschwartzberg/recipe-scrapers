@@ -1,5 +1,5 @@
 import extruct
-from ._utils import get_minutes, normalize_string
+from ._utils import get_minutes, normalize_string, get_diet_from_tags
 
 SCHEMA_ORG_HOST = "schema.org"
 SCHEMA_NAMES = ["Recipe", "WebPage"]
@@ -89,11 +89,14 @@ class SchemaOrg:
 
     def suitable_for_diet(self):
         diet = self.data.get("suitableForDiet")
-
+        tags = self.tags()
         if diet is None or not diet:
-            return []
+            if tags is None or not tags:
+                return []
+            return get_diet_from_tags(tags)
         if type(diet) == list:
-            return [x.strip().replace('http://schema.org/', '').replace('Diet', '').lower() for x in diet]
+            diet_info = [x.strip().replace('http://schema.org/', '').replace('Diet', '').lower() for x in diet]
+            return list(set(diet_info).union(set(get_diet_from_tags(tags))))
 
     def ratings(self):
         ratings = self.data.get("aggregateRating", None)
