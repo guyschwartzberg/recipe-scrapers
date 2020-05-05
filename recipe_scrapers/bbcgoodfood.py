@@ -1,5 +1,5 @@
 from ._abstract import AbstractScraper
-from ._utils import get_minutes, normalize_string, get_yields
+from ._utils import get_minutes, normalize_string, get_yields, get_diet_from_tags
 
 
 class BBCGoodFood(AbstractScraper):
@@ -63,3 +63,13 @@ class BBCGoodFood(AbstractScraper):
             normalize_string(instruction.get_text())
             for instruction in instructions
         ])
+
+    def tags(self):
+        tags = self.soup.findAll(
+            'meta',
+            {'itemprop': ['recipeCuisine', 'recipeCategory', 'keywords']}
+        )
+
+        return list(set([
+            normalize_string(tag['content'])
+            for tag in tags]))

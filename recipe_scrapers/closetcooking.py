@@ -41,3 +41,13 @@ class ClosetCooking(AbstractScraper):
             normalize_string(instruction.get_text())
             for instruction in instructions
         ])
+
+    def tags(self):
+        tags = self.soup.findAll(
+            'a',
+            {'rel': 'category tag'}
+        )
+        return [
+            normalize_string(tag.get_text())
+            for tag in tags
+        ]

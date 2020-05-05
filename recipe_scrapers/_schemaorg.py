@@ -1,5 +1,5 @@
 import extruct
-from ._utils import get_minutes, normalize_string
+from ._utils import get_minutes, normalize_string, get_diet_from_tags
 
 SCHEMA_ORG_HOST = "schema.org"
 SCHEMA_NAMES = ["Recipe", "WebPage"]
@@ -87,6 +87,17 @@ class SchemaOrg:
             )
         return recipeInstructions
 
+    def suitable_for_diet(self):
+        diet = self.data.get("suitableForDiet")
+        tags = self.tags()
+        if diet is None or not diet:
+            if tags is None or not tags:
+                return []
+            return get_diet_from_tags(tags)
+        if type(diet) == list:
+            diet_info = [x.strip().replace('http://schema.org/', '').replace('Diet', '').lower() for x in diet]
+            return list(set(diet_info).union(set(get_diet_from_tags(tags))))
+
     def ratings(self):
         ratings = self.data.get("aggregateRating", None)
         if ratings is None:
@@ -95,3 +106,12 @@ class SchemaOrg:
         if type(ratings) == dict:
             return round(float(ratings.get('ratingValue')), 2)
         return round(float(ratings), 2)
+
+    def tags(self):
+        tags = self.data.get("keywords")
+        if tags is None:
+            raise SchemaOrgException('No tag data in SchemaOrg.')
+        if type(tags) == str:
+            return [x.strip() for x in tags.split(',')]
+
+

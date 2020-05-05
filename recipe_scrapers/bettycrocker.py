@@ -100,3 +100,12 @@ class BettyCrocker(AbstractScraper):
         if '\xa0Ratings' in r:
             r = r.replace('\xa0Ratings', '')
         return int(r)
+
+    def tags(self):
+        tags = self.soup.find(
+            'meta',
+            {'property': 'gmi:topics'}
+        )
+
+        if type(tags['content']) == str:
+            return [x.strip() for x in tags['content'].split(',')]

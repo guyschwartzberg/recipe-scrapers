@@ -7,8 +7,11 @@ from ._schemaorg import (
     SchemaOrgException
 )
 
+from ._utils import get_diet_from_tags, normalize_string
 
 # some sites close their content for 'bots', so user-agent must be supplied
+
+
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
 }
@@ -154,8 +157,23 @@ class AbstractScraper:
     def ratings(self):
         raise NotImplementedError("This should be implemented.")
 
+    @Decorators.schema_org_priority
+    def suitable_for_diet(self):
+        return get_diet_from_tags(self.tags())
+
     def reviews(self):
         raise NotImplementedError("This should be implemented.")
+
+    @Decorators.schema_org_priority
+    def tags(self):
+        tags_list = self.soup.find(
+            'meta',
+            {'name': 'keywords'}
+        )
+
+        if tags_list is not None and type(tags_list['content']) == str:
+            return [x.strip() for x in normalize_string(tags_list['content']).split(',')]
+        return []
 
     def links(self):
         invalid_href = ('#', '')

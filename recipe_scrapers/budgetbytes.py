@@ -1,5 +1,6 @@
 from ._abstract import AbstractScraper
 from ._utils import get_minutes, normalize_string, get_yields
+import re, json
 
 
 class BudgetBytes(AbstractScraper):
@@ -57,3 +58,13 @@ class BudgetBytes(AbstractScraper):
                 {"class": "wprm-recipe-rating-average"}
             ).get_text()), 2
         )
+
+    def tags(self):
+        pattern = re.compile('window._zem_rp_post_tags = (\\[.*?\\]);')
+        info = pattern.findall(self.soup.prettify())
+        second = []
+        if info:
+            second = eval(info[0], {'__builtins__':None}, {})
+        second = [x.replace('+', '').replace('recipes', '').lower() for x in second]
+        return second
+

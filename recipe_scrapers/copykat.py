@@ -113,3 +113,14 @@ class CopyKat(AbstractScraper):
             {'style': 'display: block;'}).text)
 
         return d if d else None
+
+    def tags(self):
+        tags = self.soup.findAll(
+            'a',
+            {'rel': 'category tag'}
+        )
+        return [
+            normalize_string(tag.get_text())
+            for tag in tags
+        ]
+

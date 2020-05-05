@@ -1,6 +1,8 @@
 from ._abstract import AbstractScraper
 from ._utils import get_minutes, normalize_string, get_yields
 
+YIELDS = ['Makes', 'Serves', 'For']
+TAGS = ["Occasion", "Recipe Course", "Meal", "Cooking Method", "Dietary Consideration", "Type of Dish"]
 
 class Cookstr(AbstractScraper):
 
@@ -32,10 +34,13 @@ class Cookstr(AbstractScraper):
             {'class': 'attrLabel'}
         )
         total_serves = 0
+
         for section in sections:
-            serves = section.find(text='Serves')
-            if serves:
-                total_serves += get_yields(serves.parent.parent)
+            for keyword in YIELDS:
+                serves = section.find(text=keyword)
+                if serves:
+                    total_serves = get_yields(section.next_sibling.text)
+                    return total_serves
         return total_serves
 
     def ingredients(self):
@@ -59,3 +64,18 @@ class Cookstr(AbstractScraper):
             normalize_string(instruction.get_text())
             for instruction in instructions.findAll('p')
         ])
+
+    def tags(self):
+        sections = self.soup.findAll(
+            'span',
+            {'class': 'attrLabel'}
+        )
+        tag_list = []
+
+        for section in sections:
+            for keyword in TAGS:
+                tag = section.find(text=keyword)
+                if tag:
+                    temp_tags = normalize_string(section.next_sibling.text)
+                    tag_list.extend([x.strip() for x in temp_tags.split(',')])
+        return tag_list
