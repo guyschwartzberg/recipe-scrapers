@@ -64,5 +64,5 @@ class TestAllRecipesFallbackFormatScraper(ScraperTest):
     def test_ratings(self):
         self.assertEqual(
             4.70,
-            self.harvester_class.ratings()
+            self.harvester_class.ratings
         )

@@ -24,4 +24,16 @@ class AllRecipes(AbstractScraper):
         else:
             return list(set(first.split("|")).union(set(second)))
 
+    def yields(self):
+        f = AbstractScraper.Decorators.schema_org_priority(self.yields)
+        if f(self) == 'None':
+            b = self.soup.find("section", {'class' : 'component recipe-ingredients-new container interactive'})
+            return int(b['data-servings'])
+
+    def id(self):
+        pattern = re.compile('https://www.allrecipes.com/recipe/(.*?)/')
+        info = pattern.findall(self.url)
+        if info:
+            return info[0]
+        return None
 

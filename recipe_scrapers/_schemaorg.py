@@ -79,13 +79,19 @@ class SchemaOrg:
         ]
 
     def instructions(self):
-        recipeInstructions = self.data.get('recipeInstructions')
-        if type(recipeInstructions) == list:
-            return '\n'.join(
-                instruction.get('text')
-                for instruction in recipeInstructions
-            )
-        return recipeInstructions
+        recipe_instructions = self.data.get('recipeInstructions')
+        if type(recipe_instructions) == list:
+            if type(recipe_instructions[0]) == str:
+                return '\n'.join(
+                    instruction
+                    for instruction in recipe_instructions
+                )
+            else:
+                return '\n'.join(
+                    instruction.get('text')
+                    for instruction in recipe_instructions
+                )
+        return recipe_instructions
 
     def suitable_for_diet(self):
         diet = self.data.get("suitableForDiet")
@@ -101,7 +107,7 @@ class SchemaOrg:
     def ratings(self):
         ratings = self.data.get("aggregateRating", None)
         if ratings is None:
-            raise SchemaOrgException('No ratings data in SchemaOrg.')
+            return None
 
         if type(ratings) == dict:
             return round(float(ratings.get('ratingValue')), 2)

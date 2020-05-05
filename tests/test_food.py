@@ -57,5 +57,5 @@ class TestFoodScraper(ScraperTest):
     def test_ratings(self):
         self.assertEqual(
             5.0,
-            self.harvester_class.ratings()
+            self.harvester_class.ratings
         )

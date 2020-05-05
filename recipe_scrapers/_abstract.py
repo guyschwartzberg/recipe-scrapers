@@ -71,11 +71,11 @@ class AbstractScraper:
         #         self.__class__.__name__
         #     ))
 
-    def url(self):
-        return self.url
-
     def host(self):
         """ get the host of the url, so we can use the correct scraper """
+        raise NotImplementedError("This should be implemented.")
+
+    def id(self):
         raise NotImplementedError("This should be implemented.")
 
     @Decorators.schema_org_priority
@@ -172,7 +172,13 @@ class AbstractScraper:
         )
 
         if tags_list is not None and type(tags_list['content']) == str:
-            return [x.strip() for x in normalize_string(tags_list['content']).split(',')]
+            tmp = [x.strip() for x in normalize_string(tags_list['content']).split(',')]
+            if 'vegetarian' in self.title().lower():
+                tmp = set([x.lower() for x in tmp])
+                tmp.add('vegetarian')
+                return list(tmp)
+            return tmp
+
         return []
 
     def links(self):

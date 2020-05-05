@@ -7,3 +7,4 @@ class BBCFood(AbstractScraper):
     @classmethod
     def host(self, domain='com'):
         return 'bbc.{}'.format(domain)
+
