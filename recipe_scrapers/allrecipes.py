@@ -31,7 +31,7 @@ class AllRecipes(AbstractScraper):
             return int(b['data-servings'])
 
     def id(self):
-        pattern = re.compile('https://www.allrecipes.com/recipe/(.*?)/')
+        pattern = re.compile('https://www.allrecipes.com/recipe/(\d+)/')
         info = pattern.findall(self.url)
         if info:
             return info[0]

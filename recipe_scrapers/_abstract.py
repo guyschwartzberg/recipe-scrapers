@@ -55,10 +55,9 @@ class AbstractScraper:
                 return str(tag) if tag.valid else None
             return bcp47_validate_wrapper
 
-    def __init__(self, url, test=False, meta_http_equiv=False):
-        if test:  # when testing, we load a file
-            with url:
-                page_data = url.read()
+    def __init__(self, url, body, meta_http_equiv=False):
+        if body:  # when testing, we load a file
+            page_data = body
         else:
             page_data = requests.get(url, headers=HEADERS).content
 

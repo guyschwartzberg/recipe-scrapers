@@ -73,10 +73,21 @@ class SchemaOrg:
         return image
 
     def ingredients(self):
-        return [
-            normalize_string(ingredient)
-            for ingredient in self.data.get("recipeIngredient", [])
-        ]
+        s = self.data.get("recipeIngredient", [])
+        if s:
+            return [
+                normalize_string(ingredient)
+                for ingredient in s
+            ]
+        else:
+            s = self.data.get("ingredients", [])
+            if s:
+                return [
+                    normalize_string(ingredient)
+                    for ingredient in s
+                ]
+            return []
+
 
     def instructions(self):
         recipe_instructions = self.data.get('recipeInstructions')
@@ -110,14 +121,19 @@ class SchemaOrg:
             return None
 
         if type(ratings) == dict:
-            return round(float(ratings.get('ratingValue')), 2)
-        return round(float(ratings), 2)
+            return round(float(ratings.get('ratingValue')) / 5.0, 2)
+        return round(float(ratings) / 5.0, 2)
 
     def tags(self):
         tags = self.data.get("keywords")
-        if tags is None:
+        cuisine = self.data.get("recipeCuisine")
+        category = self.data.get("recipeCategory")
+        if tags is None and cuisine is None and category is None:
             raise SchemaOrgException('No tag data in SchemaOrg.')
         if type(tags) == str:
-            return [x.strip() for x in tags.split(',')]
+            lst = [x.strip().lower() for x in tags.split(',')]
+            lst.extend([x.strip().lower() for x in cuisine])
+            lst.extend([x.strip().lower() for x in category])
+            return list(set(lst))
 
 

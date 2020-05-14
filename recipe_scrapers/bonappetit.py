@@ -47,3 +47,10 @@ class BonAppetit(AbstractScraper):
     #         normalize_string(instruction.get_text())
     #         for instruction in instructions
     #     ])
+
+    def id(self):
+        recipe_id = self.soup.find(
+                 'meta',
+                 {'name': "parsely-post-id"}
+             )
+        return recipe_id['content']
