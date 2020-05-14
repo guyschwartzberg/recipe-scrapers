@@ -1,6 +1,5 @@
 import re
 
-
 TIME_REGEX = re.compile(
     r'(\D*(?P<hours>\d+)\s*(hours|hrs|hr|h|Hours|H|óra))?(\D*(?P<minutes>\d+)\s*(minutes|mins|min|m|Minutes|M|perc))?'
 )
@@ -17,7 +16,9 @@ SERV_REGEX_TO = re.compile(
     r'\d+(\s+to\s+|-)\d+', flags=re.I | re.X
 )
 
-DISH_TYPE = {"keto", "lowcarb", "eggfree", "peanutfree", "soyfree", "diabetic", "glutenfree", "halal", "kosher", "lowcalorie", "lowfat", "lowlactose", "lactosefree", "lowsalt", "vegan", "vegetarian", "highfiber", "dairyfree", "lowcholesterol", "lowsodium", "nutfree"}
+DISH_TYPE = {"keto", "lowcarb", "eggfree", "peanutfree", "soyfree", "diabetic", "glutenfree", "halal", "kosher",
+             "lowcalorie", "lowfat", "lowlactose", "lactosefree", "lowsalt", "vegan", "vegetarian", "highfiber",
+             "dairyfree", "lowcholesterol", "lowsodium", "nutfree"}
 
 
 def get_minutes(element):
@@ -87,3 +88,11 @@ def get_diet_from_tags(tags):
         return None
     tags = [re.sub(r'\s+', '', x.replace("-", '')).lower() for x in tags]
     return list(set(tags).intersection(DISH_TYPE))
+
+
+def parsely_id_extract(soup):
+    recipe_id = soup.find(
+        'meta',
+        {'name': "parsely-post-id"}
+    )
+    return recipe_id['content']

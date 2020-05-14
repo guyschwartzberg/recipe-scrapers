@@ -1,5 +1,5 @@
 from ._abstract import AbstractScraper
-from ._utils import normalize_string, get_yields
+from ._utils import normalize_string, get_yields, parsely_id_extract
 
 
 class BonAppetit(AbstractScraper):
@@ -49,8 +49,4 @@ class BonAppetit(AbstractScraper):
     #     ])
 
     def id(self):
-        recipe_id = self.soup.find(
-                 'meta',
-                 {'name': "parsely-post-id"}
-             )
-        return recipe_id['content']
+        return parsely_id_extract(self.soup)

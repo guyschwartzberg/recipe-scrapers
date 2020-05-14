@@ -160,6 +160,10 @@ class AbstractScraper:
     def suitable_for_diet(self):
         return get_diet_from_tags(self.tags())
 
+    @Decorators.schema_org_priority
+    def date_published(self):
+        raise NotImplementedError("This should be implemented.")
+
     def reviews(self):
         raise NotImplementedError("This should be implemented.")
 

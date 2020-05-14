@@ -1,5 +1,6 @@
 import extruct
 from ._utils import get_minutes, normalize_string, get_diet_from_tags
+from dateutil import parser
 
 SCHEMA_ORG_HOST = "schema.org"
 SCHEMA_NAMES = ["Recipe", "WebPage"]
@@ -81,12 +82,40 @@ class SchemaOrg:
             ]
         else:
             s = self.data.get("ingredients", [])
-            if s:
-                return [
-                    normalize_string(ingredient)
-                    for ingredient in s
-                ]
+            if type(s) == list:
+                if s:
+                    return [
+                        normalize_string(ingredient)
+                        for ingredient in s
+                    ]
+            else:
+                if type(s) == str:
+                    return [s]
             return []
+
+    def date_published(self):
+        s = self.data.get("datePublished")
+        date_time = None
+        if s is not None:
+            try:
+                date_time = parser.parse(s, ignoretz=True)
+            except parser.InvalidDateError:
+                date_time = None
+        else:
+            s = self.data.get("dateCreated")
+            if s is not None:
+                try:
+                    date_time = parser.parse(s, ignoretz=True)
+                except parser.InvalidDateError:
+                    date_time = None
+            else:
+                s = self.data.get("dateModified")
+                if s is not None:
+                    try:
+                        date_time = parser.parse(s, ignoretz=True)
+                    except parser.InvalidDateError:
+                        date_time = None
+        return date_time
 
 
     def instructions(self):
@@ -120,9 +149,17 @@ class SchemaOrg:
         if ratings is None:
             return None
 
+        try:
+            if self.data.get('publisher')['name'] == 'Tasty':
+                ratings_scale = 100.0
+            else:
+                ratings_scale = 5.0
+        except (KeyError, TypeError):
+            ratings_scale = 5.0
+
         if type(ratings) == dict:
-            return round(float(ratings.get('ratingValue')) / 5.0, 2)
-        return round(float(ratings) / 5.0, 2)
+            return round(float(ratings.get('ratingValue')) / ratings_scale, 2)
+        return round(float(ratings) / ratings_scale, 2)
 
     def tags(self):
         tags = self.data.get("keywords")
@@ -132,8 +169,16 @@ class SchemaOrg:
             raise SchemaOrgException('No tag data in SchemaOrg.')
         if type(tags) == str:
             lst = [x.strip().lower() for x in tags.split(',')]
-            lst.extend([x.strip().lower() for x in cuisine])
-            lst.extend([x.strip().lower() for x in category])
+            if cuisine is not None:
+                if type(cuisine) == list:
+                    lst.extend([x.strip().lower() for x in cuisine])
+                elif type(cuisine) == str:
+                    lst.append(cuisine)
+            if category is not None:
+                if type(category) == list:
+                    lst.extend([x.strip().lower() for x in category])
+                elif type(category) == str:
+                    lst.append(category)
             return list(set(lst))
 
 

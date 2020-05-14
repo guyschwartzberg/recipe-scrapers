@@ -1,6 +1,7 @@
 from ._abstract import AbstractScraper
 from ._utils import get_minutes, normalize_string, get_yields
-import re, json
+import re
+from dateutil import parser
 
 
 class BudgetBytes(AbstractScraper):
@@ -80,3 +81,13 @@ class BudgetBytes(AbstractScraper):
             return info[0]
         return None
 
+    def date_published(self):
+        published = self.soup.find(
+            'meta',
+                {'property': 'article:published_time'}
+        )
+        try:
+            date_time = parser.parse(published['content'], ignoretz=True)
+        except (KeyError, parser.InvalidDateError):
+            date_time = None
+        return date_time

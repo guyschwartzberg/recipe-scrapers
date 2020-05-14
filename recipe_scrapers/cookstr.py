@@ -4,11 +4,12 @@ from ._utils import get_minutes, normalize_string, get_yields
 YIELDS = ['Makes', 'Serves', 'For']
 TAGS = ["Occasion", "Recipe Course", "Meal", "Cooking Method", "Dietary Consideration", "Type of Dish"]
 
+
 class Cookstr(AbstractScraper):
 
     @classmethod
     def host(self):
-        return 'Cookstr.com'
+        return 'cookstr.com'
 
     def title(self):
         return normalize_string(self.soup.find(
