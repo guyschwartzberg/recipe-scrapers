@@ -18,3 +18,11 @@ class Tasty(AbstractScraper):
         s = json.loads(tags_tag.contents[0])
         tag_list = s['props']['pageProps']['recipe']['tags']
         return [tag['name'] for tag in tag_list]
+
+    def id(self):
+        return self.soup.find(
+            'div',
+            {'class':'recipe-page content-wrap content-container xs-flex-grow-1 clearfix xs-mx-auto xs-col-12'}
+
+
+        )['data-recipe-id']

@@ -57,7 +57,7 @@ class TestEpicurious(ScraperTest):
         )
 
     def test_ratings(self):
-        return self.assertGreaterEqual(self.harvester_class.ratings(), 0.99)
+        return self.assertGreaterEqual(self.harvester_class.ratings, 0.99)
 
     def test_reviews(self):
         self.assertCountEqual(

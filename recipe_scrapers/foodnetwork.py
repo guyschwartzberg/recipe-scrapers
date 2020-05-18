@@ -1,3 +1,5 @@
+import re
+
 from ._abstract import AbstractScraper
 from ._utils import get_minutes, normalize_string, get_yields
 
@@ -48,3 +50,10 @@ class FoodNetwork(AbstractScraper):
             for instruction in instructions
             if instruction.get_text(strip=True) not in ('Watch how to make this recipe.', )
         ])
+
+    def id(self):
+        pattern = re.compile('https://www.foodnetwork.com/recipes/.*-(\d+$)')
+        info = pattern.findall(self.url)
+        if info:
+            return info[0]
+        return None

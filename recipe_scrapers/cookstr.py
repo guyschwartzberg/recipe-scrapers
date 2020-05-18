@@ -4,6 +4,7 @@ from ._utils import get_minutes, normalize_string, get_yields
 YIELDS = ['Makes', 'Serves', 'For']
 TAGS = ["Occasion", "Recipe Course", "Meal", "Cooking Method", "Dietary Consideration", "Type of Dish"]
 
+
 class Cookstr(AbstractScraper):
 
     @classmethod
@@ -79,3 +80,9 @@ class Cookstr(AbstractScraper):
                     temp_tags = normalize_string(section.next_sibling.text)
                     tag_list.extend([x.strip() for x in temp_tags.split(',')])
         return tag_list
+
+    def id(self):
+        return self.soup.find(
+            'div',
+            {'class': 'articleDiv articleType28 numCols'}
+        )['data-a-id']

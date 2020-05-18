@@ -4,7 +4,7 @@
 # 8 February, 2020
 # =======================================================
 from ._abstract import AbstractScraper
-from ._utils import get_minutes, normalize_string
+from ._utils import normalize_string
 
 
 class CopyKat(AbstractScraper):
@@ -18,32 +18,96 @@ class CopyKat(AbstractScraper):
 
     def total_time(self):
         total_time = 0
-        try:
+        tt = self.soup.find(
+            'div',
+            {
+                'class' : 'wprm-recipe-block-container wprm-recipe-block-container-inline wprm-block-text-normal wprm-recipe-time-container wprm-recipe-total-time-container'
+            })
+        if tt:
             tt1 = self.soup.find(
                 'span',
-                {'class': "wprm-recipe-details wprm-recipe-details-hours wprm-recipe-total_time wprm-recipe-total_time-hours"}
-            ).get_text()
-        except Exception:
-            tt1 = 0
-        tt2 = self.soup.find(
-            'span',
-            {'class': 'wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes'}
-        ).get_text()
-        if tt1:
-            tt3 = (int(tt1)*60) + int(tt2)
-            tt2 = get_minutes(tt3)
-            if tt3 and (tt2 == 0):
-                total_time = tt3
+                {
+                    'class': "wprm-recipe-details wprm-recipe-details-hours wprm-recipe-total_time wprm-recipe-total_time-hours"}
+            )
+            if not tt1:
+                tt1 = 0
             else:
-                total_time = tt2
-        elif tt2:
-            total_time = tt2
-        return total_time
+                tt1 = tt1.get_text()
+            tt2 = self.soup.find(
+                'span',
+                {
+                    'class': 'wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes'}
+            )
+            if not tt2:
+                tt2 = 0
+            else:
+                tt2 = tt2.get_text()
+            tt3 = (int(tt1) * 60) + int(tt2)
+            if tt3 != 0:
+                return tt3
+
+        pt = self.soup.find(
+            'div',
+            {
+                'class': 'wprm-recipe-block-container wprm-recipe-block-container-inline wprm-block-text-normal wprm-recipe-time-container wprm-recipe-prep-time-container'
+            })
+        if pt:
+            pt1 = self.soup.find(
+                'span',
+                {
+                    'class': "wprm-recipe-details wprm-recipe-details-hours wprm-recipe-prep_time wprm-recipe-prep_time-hours"}
+            )
+            if not pt1:
+                pt1 = 0
+            else:
+                pt1 = pt1.get_text()
+            pt2 = self.soup.find(
+                'span',
+                {
+                    'class': 'wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-prep_time wprm-recipe-prep_time-minutes'}
+            )
+            if not pt2:
+                pt2 = 0
+            else:
+                pt2 = pt2.get_text()
+            pt3 = (int(pt1) * 60) + int(pt2)
+        else:
+            pt3 = 0
+
+        ct = self.soup.find(
+            'div',
+            {
+                'class': 'wprm-recipe-block-container wprm-recipe-block-container-inline wprm-block-text-normal wprm-recipe-time-container wprm-recipe-cook-time-container'
+            })
+        if ct:
+            ct1 = self.soup.find(
+                'span',
+                {
+                    'class': "wprm-recipe-details wprm-recipe-details-hours wprm-recipe-cook_time wprm-recipe-cook_time-hours"}
+            )
+            if not ct1:
+                ct1 = 0
+            else:
+                ct1 = ct1.get_text()
+            ct2 = self.soup.find(
+                'span',
+                {
+                    'class': 'wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-cook_time wprm-recipe-cook_time-minutes'}
+            )
+            if not ct2:
+                ct2 = 0
+            else:
+                ct2 = ct2.get_text()
+            ct3 = (int(ct1) * 60) + int(ct2)
+        else:
+            ct3 = 0
+        return pt3 + ct3
 
     def yields(self):
         recipe_yield = self.soup.find(
             'div',
-            {'class': "wprm-recipe-servings-container wprm-recipe-block-container wprm-recipe-block-container-inline wprm-block-text-normal"}
+            {
+                'class': "wprm-recipe-servings-container wprm-recipe-block-container wprm-recipe-block-container-inline wprm-block-text-normal"}
         ).get_text()
         if 'Servings:' in recipe_yield:
             ry = normalize_string(recipe_yield[9:])
@@ -88,7 +152,8 @@ class CopyKat(AbstractScraper):
                 try:
                     header = instruct.find(
                         'h4',
-                        {'class': 'wprm-recipe-group-name wprm-recipe-instruction-group-name wprm-block-text-bold'}).text
+                        {
+                            'class': 'wprm-recipe-group-name wprm-recipe-instruction-group-name wprm-block-text-bold'}).text
                 except Exception:
                     header = None
                 if header != None:
@@ -101,11 +166,18 @@ class CopyKat(AbstractScraper):
             return data
 
     def ratings(self):
-        r1 = self.soup.find(
-            'div',
-            {'class': 'wprm-recipe-rating-details wprm-block-text-normal'}
-        ).get_text()
+        r1 = round(float(self.soup.find(
+            'span',
+            {'class': 'wprm-recipe-rating-average'}
+        ).get_text()) / 5.0, 2)
         return r1
+
+    def number_of_raters(self):
+        return int(
+            self.soup.find(
+                "span",
+                {"class": "wprm-recipe-rating-count"}
+            ).get_text())
 
     def description(self):
         d = normalize_string(self.soup.find(
@@ -119,8 +191,22 @@ class CopyKat(AbstractScraper):
             'a',
             {'rel': 'category tag'}
         )
-        return [
+        tags = [
             normalize_string(tag.get_text())
             for tag in tags
         ]
 
+        tags.append(normalize_string(self.soup.find(
+            "span", {"class": "wprm-recipe-cuisine wprm-block-text-normal"}
+        ).get_text()))
+
+        tags.append(normalize_string(self.soup.find(
+            "span", {"class": "wprm-recipe-course wprm-block-text-normal"}
+        ).get_text()))
+        return tags
+
+    def id(self):
+        return self.soup.find(
+            'div',
+            {'class': 'wprm-recipe-container'}
+        )['data-recipe-id']

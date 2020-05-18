@@ -1,3 +1,5 @@
+import json
+
 from ._abstract import AbstractScraper
 from ._utils import get_minutes, normalize_string, get_yields
 
@@ -51,3 +53,12 @@ class FoodRepublic(AbstractScraper):
             normalize_string(instruction.get_text())
             for instruction in instructions
         ])
+
+    def tags(self):
+        tags = self.soup.find(
+            'meta',
+            {'name': 'parsely-page'}
+        )['content']
+
+        s = json.loads(tags)['tags']
+        return [normalize_string(x) for x in s]

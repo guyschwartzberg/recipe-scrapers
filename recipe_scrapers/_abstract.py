@@ -55,10 +55,9 @@ class AbstractScraper:
                 return str(tag) if tag.valid else None
             return bcp47_validate_wrapper
 
-    def __init__(self, url, test=False, meta_http_equiv=False):
-        if test:  # when testing, we load a file
-            with url:
-                page_data = url.read()
+    def __init__(self, url, body, meta_http_equiv=False):
+        if body:  # when testing, we load a file
+            page_data = body
         else:
             page_data = requests.get(url, headers=HEADERS).content
 
@@ -71,11 +70,11 @@ class AbstractScraper:
         #         self.__class__.__name__
         #     ))
 
-    def url(self):
-        return self.url
-
     def host(self):
         """ get the host of the url, so we can use the correct scraper """
+        raise NotImplementedError("This should be implemented.")
+
+    def id(self):
         raise NotImplementedError("This should be implemented.")
 
     @Decorators.schema_org_priority
@@ -158,8 +157,16 @@ class AbstractScraper:
         raise NotImplementedError("This should be implemented.")
 
     @Decorators.schema_org_priority
+    def number_of_raters(self):
+        raise NotImplementedError("This should be implemented.")
+
+    @Decorators.schema_org_priority
     def suitable_for_diet(self):
         return get_diet_from_tags(self.tags())
+
+    @Decorators.schema_org_priority
+    def date_published(self):
+        raise NotImplementedError("This should be implemented.")
 
     def reviews(self):
         raise NotImplementedError("This should be implemented.")
@@ -172,7 +179,13 @@ class AbstractScraper:
         )
 
         if tags_list is not None and type(tags_list['content']) == str:
-            return [x.strip() for x in normalize_string(tags_list['content']).split(',')]
+            tmp = [x.strip() for x in normalize_string(tags_list['content']).split(',')]
+            if 'vegetarian' in self.title().lower():
+                tmp = set([x.lower() for x in tmp])
+                tmp.add('vegetarian')
+                return list(tmp)
+            return tmp
+
         return []
 
     def links(self):

@@ -1,5 +1,6 @@
 import extruct
 from ._utils import get_minutes, normalize_string, get_diet_from_tags
+from dateutil import parser
 
 SCHEMA_ORG_HOST = "schema.org"
 SCHEMA_NAMES = ["Recipe", "WebPage"]
@@ -73,19 +74,64 @@ class SchemaOrg:
         return image
 
     def ingredients(self):
-        return [
-            normalize_string(ingredient)
-            for ingredient in self.data.get("recipeIngredient", [])
-        ]
+        s = self.data.get("recipeIngredient", [])
+        if s:
+            return [
+                normalize_string(ingredient)
+                for ingredient in s
+            ]
+        else:
+            s = self.data.get("ingredients", [])
+            if type(s) == list:
+                if s:
+                    return [
+                        normalize_string(ingredient)
+                        for ingredient in s
+                    ]
+            else:
+                if type(s) == str:
+                    return [s]
+            return []
+
+    def date_published(self):
+        s = self.data.get("datePublished")
+        date_time = None
+        if s is not None:
+            try:
+                date_time = parser.parse(s, ignoretz=True)
+            except parser.InvalidDateError:
+                date_time = None
+        else:
+            s = self.data.get("dateCreated")
+            if s is not None:
+                try:
+                    date_time = parser.parse(s, ignoretz=True)
+                except parser.InvalidDateError:
+                    date_time = None
+            else:
+                s = self.data.get("dateModified")
+                if s is not None:
+                    try:
+                        date_time = parser.parse(s, ignoretz=True)
+                    except parser.InvalidDateError:
+                        date_time = None
+        return date_time
+
 
     def instructions(self):
-        recipeInstructions = self.data.get('recipeInstructions')
-        if type(recipeInstructions) == list:
-            return '\n'.join(
-                instruction.get('text')
-                for instruction in recipeInstructions
-            )
-        return recipeInstructions
+        recipe_instructions = self.data.get('recipeInstructions')
+        if type(recipe_instructions) == list:
+            if type(recipe_instructions[0]) == str:
+                return '\n'.join(
+                    instruction
+                    for instruction in recipe_instructions
+                )
+            else:
+                return '\n'.join(
+                    instruction.get('text')
+                    for instruction in recipe_instructions
+                )
+        return recipe_instructions
 
     def suitable_for_diet(self):
         diet = self.data.get("suitableForDiet")
@@ -101,17 +147,53 @@ class SchemaOrg:
     def ratings(self):
         ratings = self.data.get("aggregateRating", None)
         if ratings is None:
-            raise SchemaOrgException('No ratings data in SchemaOrg.')
+            return None
+
+        try:
+            if self.data.get('publisher')['name'] == 'Tasty':
+                ratings_scale = 100.0
+            else:
+                ratings_scale = 5.0
+        except (KeyError, TypeError):
+            ratings_scale = 5.0
 
         if type(ratings) == dict:
-            return round(float(ratings.get('ratingValue')), 2)
-        return round(float(ratings), 2)
+            return round(float(ratings.get('ratingValue')) / ratings_scale, 2)
+        return round(float(ratings) / ratings_scale, 2)
+
+    def number_of_raters(self):
+        ratings = self.data.get("aggregateRating", None)
+        if ratings is None:
+            return None
+
+        if type(ratings) == dict:
+            rating_count = ratings.get('ratingCount')
+            if rating_count:
+                return int(ratings.get('ratingCount'))
+            review_count = ratings.get('reviewCount')
+            if review_count:
+                return int(ratings.get('reviewCount'))
+        return None
+
 
     def tags(self):
         tags = self.data.get("keywords")
-        if tags is None:
+        cuisine = self.data.get("recipeCuisine")
+        category = self.data.get("recipeCategory")
+        if tags is None and cuisine is None and category is None:
             raise SchemaOrgException('No tag data in SchemaOrg.')
         if type(tags) == str:
-            return [x.strip() for x in tags.split(',')]
+            lst = [x.strip().lower() for x in tags.split(',')]
+            if cuisine is not None:
+                if type(cuisine) == list:
+                    lst.extend([x.strip().lower() for x in cuisine])
+                elif type(cuisine) == str:
+                    lst.append(cuisine)
+            if category is not None:
+                if type(category) == list:
+                    lst.extend([x.strip().lower() for x in category])
+                elif type(category) == str:
+                    lst.append(category)
+            return list(set(lst))
 
 

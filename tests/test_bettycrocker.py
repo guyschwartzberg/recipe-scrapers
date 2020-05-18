@@ -55,5 +55,5 @@ class TestBettyCrocker(ScraperTest):
     def test_ratings(self):
         self.assertEqual(
             46,
-            self.harvester_class.ratings()
+            self.harvester_class.ratings
         )
