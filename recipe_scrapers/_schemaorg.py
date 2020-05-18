@@ -161,6 +161,21 @@ class SchemaOrg:
             return round(float(ratings.get('ratingValue')) / ratings_scale, 2)
         return round(float(ratings) / ratings_scale, 2)
 
+    def number_of_raters(self):
+        ratings = self.data.get("aggregateRating", None)
+        if ratings is None:
+            return None
+
+        if type(ratings) == dict:
+            rating_count = ratings.get('ratingCount')
+            if rating_count:
+                return int(ratings.get('ratingCount'))
+            review_count = ratings.get('reviewCount')
+            if review_count:
+                return int(ratings.get('reviewCount'))
+        return None
+
+
     def tags(self):
         tags = self.data.get("keywords")
         cuisine = self.data.get("recipeCuisine")

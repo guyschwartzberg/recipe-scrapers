@@ -157,6 +157,10 @@ class AbstractScraper:
         raise NotImplementedError("This should be implemented.")
 
     @Decorators.schema_org_priority
+    def number_of_raters(self):
+        raise NotImplementedError("This should be implemented.")
+
+    @Decorators.schema_org_priority
     def suitable_for_diet(self):
         return get_diet_from_tags(self.tags())
 

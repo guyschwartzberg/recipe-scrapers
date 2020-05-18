@@ -65,6 +65,13 @@ class BudgetBytes(AbstractScraper):
             ).get_text()) / 5.0, 2
         )
 
+    def number_of_raters(self):
+        return int(
+            self.soup.find(
+                "span",
+                {"class": "wprm-recipe-rating-count"}
+            ).get_text())
+
     def tags(self):
         pattern = re.compile('window._zem_rp_post_tags = (\\[.*?\\]);')
         info = pattern.findall(self.soup.prettify())

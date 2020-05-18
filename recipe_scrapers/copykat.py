@@ -172,6 +172,13 @@ class CopyKat(AbstractScraper):
         ).get_text()) / 5.0, 2)
         return r1
 
+    def number_of_raters(self):
+        return int(
+            self.soup.find(
+                "span",
+                {"class": "wprm-recipe-rating-count"}
+            ).get_text())
+
     def description(self):
         d = normalize_string(self.soup.find(
             'span',
